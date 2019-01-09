@@ -10,6 +10,7 @@ const { ObjectId } = require('mongodb');
 // Import Models
 const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
+const { authenticate } = require('./middleware/authenticate');
 
 // Set port
 const port = process.env.PORT;
@@ -113,6 +114,9 @@ app.post('/user', (req, res) => {
   });
 });
 
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
+});
 
 // Start server
 app.listen(port, () => {
