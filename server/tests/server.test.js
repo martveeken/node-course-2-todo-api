@@ -8,10 +8,13 @@ const { Todo } = require('./../models/todo');
 const dummyTodos = [
   {
     _id: new ObjectId(),
-    text: 'First test todo'
+    text: 'First test todo',
+    completed: false
   }, {
     _id: new ObjectId(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 333
   }
 ];
 
@@ -117,7 +120,6 @@ describe('DELETE /todos/:id', () => {
         }
 
         Todo.findById(hexId).then((todo) => {
-          console.log('expect', todo);
           expect(todo).toBeFalsy();
           done();
         }).catch((e) => done(e));
@@ -139,3 +141,27 @@ describe('DELETE /todos/:id', () => {
       .end(done);
   });
 })
+
+describe('PATCH /todos/:id', () => {
+  it('should return 200 and patched', (done) => {
+    const hexId = dummyTodos[0]._id.toHexString();
+    const text = 'New text';
+
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        console.log(res.body.todo);
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(true);
+        expect(res.body.todo.completedAt).toBe('Number');
+      })
+      .end(done);
+  });
+});
+//   it('Should be turned to false')
+// });
