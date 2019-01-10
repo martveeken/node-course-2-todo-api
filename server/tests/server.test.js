@@ -232,27 +232,3 @@ describe('/POST /users/login', () => {
       });
   });
 });
-
-// describe('PATCH /todos/:id', () => {
-//   it('should return 200 and patched', (done) => {
-//     const hexId = dummyTodos[0]._id.toHexString();
-//     const text = 'New text';
-//
-//     request(app)
-//       .patch(`/todos/${hexId}`)
-//       .send({
-//         completed: true,
-//         text
-//       })
-//       .expect(200)
-//       .expect((res) => {
-//         console.log(res.body.todo);
-//         expect(res.body.todo.text).toBe(text);
-//         expect(res.body.todo.completed).toBe(true);
-//         expect(res.body.todo.completedAt).toBe('Number');
-//       })
-//       .end(done);
-//   });
-// });
-//   it('Should be turned to false')
-// });
