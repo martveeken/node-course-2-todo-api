@@ -5,7 +5,12 @@ const { User } = require('./../../models/user');
 
 const userOneId = new ObjectId();
 const userTwoId = new ObjectId();
-const token = jwt.sign({ _id: userOneId.toHexString(), access: 'auth' }, 'abc123').toString();
+const token = jwt.sign({
+  _id: userOneId.toHexString(), access: 'auth'
+  }, process.env.JWT_SECRET).toString();
+const tokenTwo = jwt.sign({
+  _id: userTwoId.toHexString(), access: 'auth'
+  }, process.env.JWT_SECRET).toString();
 
 const users = [{
   _id: userOneId,
@@ -18,19 +23,25 @@ const users = [{
 }, {
   _id: userTwoId,
   email: 'kees@example.com',
-  password: 'userTwoPass'
+  password: 'userTwoPass',
+  tokens: [{
+    access: 'auth',
+    token: tokenTwo
+  }]
 }];
 
 const dummyTodos = [
   {
     _id: new ObjectId(),
     text: 'First test todo',
-    completed: false
+    completed: false,
+    _creator: userOneId
   }, {
     _id: new ObjectId(),
     text: 'Second test todo',
     completed: true,
-    completedAt: 333
+    completedAt: 333,
+    _creator: userTwoId
   }
 ];
 

@@ -18,6 +18,7 @@ describe('POST /todos', () => {
 
     request(app)
       .post('/todos')
+      .set('x-auth', users[0].tokens[0].token)
       .send({ text })
       .expect(200)
       .expect((res) => {
@@ -39,6 +40,7 @@ describe('POST /todos', () => {
   it('Should not create todo with invalid body data', (done) => {
     request(app)
       .post('/todos')
+      .set('x-auth', users[0].tokens[0].token)
       .send({})
       .expect(400)
       .end((err, res) => {
@@ -57,9 +59,10 @@ describe('GET /todos', () => {
   it('should get all todos', (done) => {
     request(app)
       .get('/todos')
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(2);
+        expect(res.body.todos.length).toBe(1);
       })
       .end(done);
   });
@@ -69,6 +72,7 @@ describe('GET /todos/:id', () => {
   it('should pass a single todo', (done) => {
     request(app)
       .get(`/todos/${dummyTodos[0]._id.toHexString()}`)
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
         expect(res.body.todo.text).toBe(dummyTodos[0].text);
@@ -76,10 +80,19 @@ describe('GET /todos/:id', () => {
       .end(done);
   });
 
+  it('should NOT pass a single todo created by other user', (done) => {
+    request(app)
+      .get(`/todos/${dummyTodos[1]._id.toHexString()}`)
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(404)
+      .end(done);
+  });
+
   it('should return 404 if todo not found', (done) => {
     const hexId = new ObjectId().toHexString();
     request(app)
       .get(`/todos/${hexId}`)
+      .set('x-auth', users[0].tokens[0].token)
       .expect(404)
       .end(done);
   });
@@ -87,6 +100,7 @@ describe('GET /todos/:id', () => {
   it('should return 404 if todo invalid ', (done) => {
     request(app)
       .get('/todos/123')
+      .set('x-auth', users[0].tokens[0].token)
       .expect(404)
       .end(done);
   });
@@ -227,6 +241,26 @@ describe('/POST /users/login', () => {
 
         User.findById(users[1]._id).then((user) => {
           expect(user.tokens.length).toBe(0);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+});
+
+describe('/DELETE /users/me/token', () => {
+  it('should delete token and return 200', (done) => {
+    request(app)
+      .post('/users/me/token')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .end((err, res) => {
+        if (!err) {
+          return done(err);
+        }
+
+        User.findById(users[0]._id).then((user) => {
+          // Dit klopt niet? Snap er niks van
+          expect(user.tokens.length).toBe(1);
           done();
         }).catch((e) => done(e));
       });
